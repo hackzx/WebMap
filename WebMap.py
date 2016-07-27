@@ -22,7 +22,7 @@ parser=argparse.ArgumentParser(prog='WebMap', description='''\
 NIXI WebMap v0.1
 ''', epilog='方便快捷！')
 parser.add_argument('ip', help='10.0.0.1-10.0.0.255 or 10.0.0.0/24 or domain.com')
-parser.add_argument('-s', '--scan', help='执行简单敏感文件扫描', action='store_false')
+# parser.add_argument('-s', '--scan', help='执行简单敏感文件扫描', action='store_false')
 parser.add_argument('-t', '--thread', metavar='num', help='自定义线程，默认100', default=100)
 parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描', metavar='port', default='80,8080,7001,8000,8008,8088,8090,9000,9001,9043,9080,9090')
 args=parser.parse_args()
