@@ -22,10 +22,13 @@ parser=argparse.ArgumentParser(prog='WebMap', description='''\
 NIXI WebMap v0.1
 ''', epilog='方便快捷！')
 parser.add_argument('ip', help='10.0.0.1-10.0.0.255 or 10.0.0.0/24 or domain.com')
-# parser.add_argument('-s', '--scan', help='执行简单敏感文件扫描', action='store_false')
+parser.add_argument('-s', '--scan', help='执行简单敏感文件扫描', action='store_true')
+parser.add_argument('-d', '--dict', help='指定目錄字典文件', default='dict')
 parser.add_argument('-t', '--thread', metavar='num', help='自定义线程，默认100', default=100)
-parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描', metavar='port', default='80,8080,7001,8000,8008,8088,8090,9000,9001,9043,9080,9090')
+parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描', metavar='port', default='80,8080,8081,7001,8000,8008,8088,8090,8091,8443,9000,9001,9043,9080,9090')
+# parser.add_argument('-o', '--output', help='輸出到文件', default=args.ip)
 args=parser.parse_args()
+
 
 # 把「10.0.0.1-10.0.0.255」和「10.0.0.0/24」两种格式的IP转为list的函数都放在这里了。
 def ip2num(ip):
@@ -54,51 +57,54 @@ def iplist2queue():
         ipQueue.put(x)
 
 # 敏感文件扫描
-def dirScan(ip):
-    ishttp = ip.find('http://')
-    if ishttp<0:
-        ip = 'http://' + ip
-    for port in ports:
-        with open('./dict','r') as f:
-            for line in f:
-                url = ip + ':' + port + '/' + line.strip('\n').strip('\r')
-                # r = requests.get('http://github.com', allow_redirects=False) 禁用重定向
-                try:
-                    r=requests.Session().head(url, headers=header, timeout=TimeOut)
-                except Exception, e:
-                    pass
-                else:
-                    pass
-                finally:
-                    try:
-                        if r.status_code == 200:
-                            print '\033[32m' + '%s -------- %d OK' %(url, r.status_code)  + '\033[0m'
-                        elif r.status_code == 403:
-                            print '\033[33m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
-                        elif r.status_code == 500:
-                            print '\033[1;36m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
-                        else:
-                            print '\033[91m' + '%s -------- %d' %(url, r.status_code)  + '\033[0m'
-                    except Exception, e:
-                        pass
-                    else:
-                        pass
-                    finally:
-                        pass
+def dirScan():
+    # ishttp = ip.find('http://')
+    # if ishttp<0:
+    #     ip = 'http://' + ip
 
+    for line in dir:
+        # url = ip + ':' + port + '/' + line.strip('\n').strip('\r')
+        url = 'http://' + ip + ':' + port + '/' + line
+        r=requests.Session().head(url, headers=header, timeout=TimeOut, allow_redirects=False)
+        if r.status_code == 200:
+            print '  └ Found: %s %d' % (url, r.status_code)
+        # if r.status_code == 200:
+        #     print '\033[32m' + '%s -------- %d OK' %(url, r.status_code)  + '\033[0m'
+        # elif r.status_code == 403:
+        #     print '\033[33m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
+        # elif r.status_code == 500:
+        #     print '\033[1;36m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
+        # else:
+        #     print '\033[91m' + '%s -------- %d' %(url, r.status_code)  + '\033[0m'
 
-# 判断返回内容是否是半角字符
-# def is_alphabet(uchar):   
-#     try:
-#         if (u'\u0041' <= uchar<=u'\u005a') or (u'\u0061' <= uchar<=u'\u007a'):
-#             return True
-#             # print '英文'
-#         else:
-#             return False
-#             # print '非英文'
-#     except:
-#         return False
-#         # print '非英文'
+# def dirscan():
+    # for port in ports:
+    #     with open('./dict','r') as f:
+    #         for line in f:
+    #             url = ip + ':' + port + '/' + line.strip('\n').strip('\r')
+    #             # r = requests.get('http://github.com', allow_redirects=False) 禁用重定向
+    #             try:
+    #                 r=requests.Session().head(url, headers=header, timeout=TimeOut)
+    #             except Exception, e:
+    #                 pass
+    #             else:
+    #                 pass
+    #             finally:
+    #                 try:
+    #                     if r.status_code == 200:
+    #                         print '\033[32m' + '%s -------- %d OK' %(url, r.status_code)  + '\033[0m'
+    #                     elif r.status_code == 403:
+    #                         print '\033[33m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
+    #                     elif r.status_code == 500:
+    #                         print '\033[1;36m' + '%s -------- %d Forbidden' %(url, r.status_code)  + '\033[0m'
+    #                     else:
+    #                         print '\033[91m' + '%s -------- %d' %(url, r.status_code)  + '\033[0m'
+    #                 except Exception, e:
+    #                     pass
+    #                 else:
+    #                     pass
+    #                 finally:
+    #                     pass
 
 printLock = threading.Lock()
 
@@ -135,19 +141,56 @@ class webmap(threading.Thread):
   └ Sever: %s
   └ Title: %s               ''' % (ip,port,status,server,title)
 
+
                             file='./'+args.ip+'.html'
                             with open(file,'a') as f:
                                 f.write('''<!DOCTYPE html>
 <p>
 <a href="http://%s:%s" target="_blank">%s:%s</a><br>
-<font size=2>
+<font size=1 face='Monaco'>
   └ Status:%s<br>
   └ Sever: %s<br>
   └ Title: %s<br>
+  └ Found: Sensitive Dir<br>
 </font>
-</p>'''%(ip,port,ip,port,status,server,title))
-                            # 这里需要改为生成html文件
-                            
+
+'''%(ip,port,ip,port,status,server,title))
+
+                            if args.scan==True:
+                                file2list()
+                                try:
+                                    # dirScan()
+                                    print '  └ Found: Sensitive Dir'
+                                    with open(file,'a') as f:
+                                        for line in dir:
+                                            url = 'http://' + ip + ':' + port + '/' + line
+                                            r=requests.Session().head(url, headers=header, timeout=TimeOut, allow_redirects=False)
+                                            # print r.status_code
+                                            if r.status_code == 200:
+                                                print '\033[32m' + '         └ [%d]/%s' % (status, line) + '\033[0m'
+                                                f.write('''<font size=1 face='Monaco'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └ <a href="http://%s:%s/%s" target="_blank">[%s]%s<a>
+</font>
+<br>
+''' % (ip,port,line,r.status_code,line))
+                                            elif r.status_code == 403:
+                                                print '\033[33m' + '         └ [%d]/%s' % (status, line) + '\033[0m'
+                                                f.write('''<font size=1 face='Monaco'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └ <a href="http://%s:%s/%s" target="_blank">[%s]%s<a>
+</font>
+<br>
+''' % (ip,port,line,r.status_code,line))
+                                            elif r.status_code == 500:
+                                                print '\033[1;36m' + '         └ [%d]/%s' % (status, line) + '\033[0m'
+                                                f.write('''<font size=1 face='Monaco'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └ <a href="http://%s:%s/%s" target="_blank">[%s]%s<a>
+</font>
+<br>
+''' % (ip,port,line,r.status_code,line))
+
+
+                                except:pass
+
                             printLock.release()
                         finally:
                             printLock.release()
@@ -158,11 +201,16 @@ class webmap(threading.Thread):
                         pass
         except:pass
 
-# 测试函数
-def test():
-    while ipQueue.qsize()>0:
-        print ipQueue.get()
-    print '\nargs.thread: '+ str(args.thread)
+# 從字典讀取待掃描目錄
+dir=[]
+def file2list():
+    with open(args.dict, 'r') as dict:
+        for line in dict.readlines():
+            line=line.strip('\n').strip('\r')
+            dir.append(line)
+    while '' in dir:
+        dir.remove('')
+
 
 # 处理自定义多线程
 def multithreading(thread_num):
@@ -171,8 +219,15 @@ def multithreading(thread_num):
         t.start()
 
 # main()
-ip=args.ip
 if __name__ == '__main__':
+
+    # if scan == true:
+        # with open(file) as f:
+            # for list in f:
+                # pass
+
+    ip=args.ip
+
     if ip.find('-')>=0:
         iplist=get_ip(ip)
         iplist2queue()
@@ -192,6 +247,10 @@ if __name__ == '__main__':
     try:
         multithreading(args.thread)
     except:pass
+
+    while True:
+        if threading.activeCount() <= 1:
+            break
 
 
 
