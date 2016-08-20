@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding:utf-8-*-
-
 import argparse
 import IPy
 import socket
@@ -31,7 +30,6 @@ parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描',
 # parser.add_argument('-o', '--output', help='輸出到文件', default=args.ip)
 args=parser.parse_args()
 
-# 把「10.0.0.1-10.0.0.255」和「10.0.0.0/24」两种格式的IP转为list的函数都放在这里了。
 def ip2num(ip):
     ip=[int(x) for x in ip.split('.')]
     return ip[0] <<24 | ip[1]<<16 | ip[2]<<8 |ip[3]
@@ -50,13 +48,11 @@ def domain2ip(domain):
     except:
         return 0
 
-# 把iplist放入队列
 ipQueue=Queue.Queue()
 def iplist2queue():
     for x in iplist:
         x=str(x)
         ipQueue.put(x)
-
 
 def webmap(ip):
     try:
@@ -79,6 +75,7 @@ def webmap(ip):
   └ Status: %s
   └ Sever: %s
   └ Title: %s               ''' % (ip,port,status,server,title)
+            title=title.replace('<', '&lt;').replace('>', '&gt;')
             file='./'+output+'.html'
             with open(file,'a') as f:
                 f.write('''<!DOCTYPE html>
@@ -91,8 +88,17 @@ def webmap(ip):
 </font>
 
 '''%(ip,port,ip,port,status,server,title))
-                
     except:pass
+    # except Exception, e:raise e
+
+dir=[]
+def file2list():
+    with open(args.dict, 'r') as dict:
+        for line in dict.readlines():
+            line=line.strip('\n').strip('\r')
+            dir.append(line)
+    while '' in dir:
+        dir.remove('')
 
 def run():
     p = Pool(100) #限制並發數 
@@ -101,10 +107,8 @@ def run():
     p.join()
 
 if __name__ == '__main__':
-
     ip=args.ip
     output=args.ip.replace('/','-')
-
     if ip.find('-')>=0:
         iplist=get_ip(ip)
         iplist2queue()
@@ -123,8 +127,3 @@ if __name__ == '__main__':
     try:
         run()
     except:pass
-
-
-
-
-
