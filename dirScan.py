@@ -14,7 +14,7 @@ TimeOut=5
 header = {'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.125 Safari/537.36','Connection':'close'}
 
 parser=argparse.ArgumentParser(prog='dirScan', description='''
-NIXI dirScan v0.1  ──用於直接掃描敏感文件
+NIXI dirScan v0.1  用於直接掃描敏感文件
 
 ''', epilog='本來是想集成到WebMap中的，然而效率大大降低，所以乾脆拿出來先弄成單獨的腳本，以後再合併吧。\
 ')

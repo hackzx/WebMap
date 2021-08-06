@@ -4,6 +4,9 @@ www.7z
 wwwroot.rar
 wwwroot.zip
 wwwroot.7z
+w.rar
+w.zip
+w.7z
 1.rar
 1.zip
 1.7z
@@ -14,13 +17,26 @@ resin-doc
 solr
 zabix
 
+.git
+.svn
+
 admin
 manager
 manage
 administrator
 phpmyadmin
+pma
+pra
 
 upload.asp
 upload.php
 upload.jsp
 upload.aspx
+
+database.inc
+common.inc
+db.inc
+connect.inc
+conn.inc
+sql.inc
+debug.inc

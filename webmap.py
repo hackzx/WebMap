@@ -27,7 +27,7 @@ parser.add_argument('ip', help='10.0.0.1-10.0.0.255 or 10.0.0.0/24 or domain.com
 parser.add_argument('-s', '--scan', help='执行简单敏感文件扫描', action='store_true')
 parser.add_argument('-d', '--dict', help='指定目錄字典文件', default='dict')
 # parser.add_argument('-t', '--thread', metavar='num', help='自定义线程，默认100', default=100)
-parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描', metavar='port', default='80,443,808,8080,8009,7001,8000,8008,8088,8888,8808,8081,8090,8091,8443,9000,9001,9002,9043,9080,9090,18080,28080')
+parser.add_argument('-p', '--port', help='自定义端口，默认全部扫描', metavar='port', default='80,443,808,3000,3700,4000,4848,8080,8009,7001,7676,8000,8008,8088,8888,8808,8081,8090,8091,8443,9000,9001,9002,9043,9060,9080,9090,9443,18080,28080')
 # parser.add_argument('-o', '--output', help='輸出到文件', default=args.ip)
 args = parser.parse_args()
 
